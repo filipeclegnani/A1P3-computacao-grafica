@@ -10,4 +10,4 @@ Quando o usuário apertar a tecla r (run) o boneco deve simular uma corrida no m
 
 Quando o usuário apertar a tecla s (stop) o boneco deve parar e voltar a posição inicial.
 
-[#3](https://github.com/filipeclegnani/A1P3-computacao-grafica/issues/1)
+[To do List](https://github.com/filipeclegnani/A1P3-computacao-grafica/issues/1)
