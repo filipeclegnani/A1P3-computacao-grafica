@@ -14,8 +14,17 @@ void desenhaCirculo(PONTO centro, float raio, COR c);
 void desenhaLinha(PONTO a, PONTO b);
 void desenhaMundo();
 void startaStickman();
+void calculaMovimento();
+void setaProximaPosicao(STICKMAN posDes, int tempo);
+void togglePassagem();
 
 STICKMAN henry = {0};
+int passagem = ANIMACAO_FASE_CONTRACT;
+//int passagem = ANIMACAO_FASE_DOWN;
+//int passagem = ANIMACAO_FASE_PASSO;
+//int passagem = ANIMACAO_FASE_UP;
+
+int settempo = 0;
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmdshow) {
 
@@ -91,9 +100,31 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 		case WM_TIMER:
 			switch(wp){
 				case SET_TIMER_60:
+					calculaMovimento();
 					desenhaMundo();
+					desenhaLinha((PONTO){ -1.0f, -0.3f }, (PONTO){ 1.0f, -0.3f });
 					SwapBuffers(GetDC(hwnd));
 					break;
+			}
+			break;
+		case WM_KEYDOWN:
+			if(wp == VK_RIGHT){
+				togglePassagem();
+			}else{
+				switch (passagem){
+					case ANIMACAO_FASE_CONTRACT:
+						passagem = ANIMACAO_FASE_UP;
+						break;
+					case ANIMACAO_FASE_DOWN:
+						passagem = ANIMACAO_FASE_CONTRACT;
+						break;
+					case ANIMACAO_FASE_PASSO:
+						passagem = ANIMACAO_FASE_DOWN;
+						break;
+					case ANIMACAO_FASE_UP:
+						passagem = ANIMACAO_FASE_PASSO;
+						break;
+				}
 			}
 			break;
 		case WM_SIZE:
@@ -109,53 +140,86 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 	return DefWindowProc(hwnd, msg, wp, lp);
 }
 
+void togglePassagem(){
+	switch (passagem){
+		case ANIMACAO_FASE_CONTRACT:
+			passagem = ANIMACAO_FASE_DOWN;
+			break;
+		case ANIMACAO_FASE_DOWN:
+			passagem = ANIMACAO_FASE_PASSO;
+			break;
+		case ANIMACAO_FASE_PASSO:
+			passagem = ANIMACAO_FASE_UP;
+			break;
+		case ANIMACAO_FASE_UP:
+			passagem = ANIMACAO_FASE_CONTRACT;
+			break;
+	}
+}
+
 void startaStickman(){
+	//angulos
+	
+	henry.ang.cabeca 		= 270;
+	henry.ang.cotovelo1		= 275;
+	henry.ang.cotovelo2		= 265;
+	henry.ang.joelho1		= 270;
+	henry.ang.joelho2		= 270;
+	henry.ang.ombro1		= 280;
+	henry.ang.ombro2		= 260;
+	henry.ang.ombroQ		= 270;
+	henry.ang.quadril1		= 280;
+	henry.ang.quadril2		= 260;
+	henry.ang.tornozelo1	= 0;
+	henry.ang.tornozelo2	= 0;
+	
+	//angulos
 	// cabeça
-	henry.cabeca.x = 0.0f;
+	henry.cabeca.x = henry.cabeca.x + 0.01;
 	henry.cabeca.y = 0.5f;
 	
 	//ombro
-	henry.ombro.x = distanciax(H_PESCOCO, 270, henry.cabeca.x);
-	henry.ombro.y = distanciay(H_PESCOCO, 270, henry.cabeca.y);
+	henry.ombro.x = distanciax(H_PESCOCO, henry.ang.cabeca, henry.cabeca.x);
+	henry.ombro.y = distanciay(H_PESCOCO, henry.ang.cabeca, henry.cabeca.y);
 	
 	//cotovelos
-	henry.cotovelo1.x = distanciax(H_BRACOS, 280, henry.ombro.x);
-	henry.cotovelo1.y = distanciay(H_BRACOS, 280, henry.ombro.y);
+	henry.cotovelo1.x = distanciax(H_BRACOS, henry.ang.ombro1, henry.ombro.x);
+	henry.cotovelo1.y = distanciay(H_BRACOS, henry.ang.ombro1, henry.ombro.y);
 	
-	henry.cotovelo2.x = distanciax(H_BRACOS, 260, henry.ombro.x);
-	henry.cotovelo2.y = distanciay(H_BRACOS, 260, henry.ombro.y);
+	henry.cotovelo2.x = distanciax(H_BRACOS, henry.ang.ombro2, henry.ombro.x);
+	henry.cotovelo2.y = distanciay(H_BRACOS, henry.ang.ombro2, henry.ombro.y);
 	
 	//mãos
-	henry.mao1.x = distanciax(H_ANTEBRACO, 275, henry.cotovelo1.x);
-	henry.mao1.y = distanciay(H_ANTEBRACO, 275, henry.cotovelo1.y);
+	henry.mao1.x = distanciax(H_ANTEBRACO, henry.ang.cotovelo1, henry.cotovelo1.x);
+	henry.mao1.y = distanciay(H_ANTEBRACO, henry.ang.cotovelo1, henry.cotovelo1.y);
 	
-	henry.mao2.x = distanciax(H_ANTEBRACO, 265, henry.cotovelo2.x);
-	henry.mao2.y = distanciay(H_ANTEBRACO, 265, henry.cotovelo2.y);
+	henry.mao2.x = distanciax(H_ANTEBRACO, henry.ang.cotovelo2, henry.cotovelo2.x);
+	henry.mao2.y = distanciay(H_ANTEBRACO, henry.ang.cotovelo2, henry.cotovelo2.y);
 	
 	//quadril
-	henry.quadril.x = distanciax(H_TRONCO, 270, henry.ombro.x);
-	henry.quadril.y = distanciay(H_TRONCO, 270, henry.ombro.y);
+	henry.quadril.x = distanciax(H_TRONCO, henry.ang.ombroQ, henry.ombro.x);
+	henry.quadril.y = distanciay(H_TRONCO, henry.ang.ombroQ, henry.ombro.y);
 	
 	//joelho
-	henry.joelho1.x = distanciax(H_COXAS, 280, henry.quadril.x);
-	henry.joelho1.y = distanciay(H_COXAS, 280, henry.quadril.y);
+	henry.joelho1.x = distanciax(H_COXAS, henry.ang.quadril1, henry.quadril.x);
+	henry.joelho1.y = distanciay(H_COXAS, henry.ang.quadril1, henry.quadril.y);
 	
-	henry.joelho2.x = distanciax(H_COXAS, 260, henry.quadril.x);
-	henry.joelho2.y = distanciay(H_COXAS, 260, henry.quadril.y);
+	henry.joelho2.x = distanciax(H_COXAS, henry.ang.quadril2, henry.quadril.x);
+	henry.joelho2.y = distanciay(H_COXAS, henry.ang.quadril2, henry.quadril.y);
 	
 	//calcanhar
-	henry.calcanhar1.x = distanciax(H_PANTURRILHA, 270, henry.joelho1.x);
-	henry.calcanhar1.y = distanciay(H_PANTURRILHA, 270, henry.joelho1.y);
+	henry.calcanhar1.x = distanciax(H_PANTURRILHA, henry.ang.joelho1, henry.joelho1.x);
+	henry.calcanhar1.y = distanciay(H_PANTURRILHA, henry.ang.joelho1, henry.joelho1.y);
 	
-	henry.calcanhar2.x = distanciax(H_PANTURRILHA, 270, henry.joelho2.x);
-	henry.calcanhar2.y = distanciay(H_PANTURRILHA, 270, henry.joelho2.y);
+	henry.calcanhar2.x = distanciax(H_PANTURRILHA, henry.ang.joelho2, henry.joelho2.x);
+	henry.calcanhar2.y = distanciay(H_PANTURRILHA, henry.ang.joelho2, henry.joelho2.y);
 	
 	//pé
-	henry.pe1.x = distanciax(H_PES, 0, henry.calcanhar1.x);
-	henry.pe1.y = distanciay(H_PES, 0, henry.calcanhar1.y);
+	henry.pe1.x = distanciax(H_PES, henry.ang.tornozelo1, henry.calcanhar1.x);
+	henry.pe1.y = distanciay(H_PES, henry.ang.tornozelo1, henry.calcanhar1.y);
 	
-	henry.pe2.x = distanciax(H_PES, 0, henry.calcanhar2.x);
-	henry.pe2.y = distanciay(H_PES, 0, henry.calcanhar2.y);
+	henry.pe2.x = distanciax(H_PES, henry.ang.tornozelo2, henry.calcanhar2.x);
+	henry.pe2.y = distanciay(H_PES, henry.ang.tornozelo2, henry.calcanhar2.y);
 }
 
 void desenhaCirculo(PONTO centro, float raio, COR c){
@@ -185,12 +249,6 @@ void desenhaLinha(PONTO a, PONTO b){
 	glFlush();
 }
 
-PONTO pto(float x, float y){
-	PONTO a;
-	a.x = (float)x;
-	a.y = (float)y;
-	return a;
-}
 
 void desenhaMundo(){
 	// cabeça
@@ -229,9 +287,155 @@ void desenhaMundo(){
 	desenhaLinha(henry.calcanhar1, henry.pe1);
 	desenhaLinha(henry.calcanhar2, henry.pe2);
 	
-	
-	desenhaLinha(henry.quadril, pto(0.5f, 0.5f));
 }
 
+void calculaMovimento(){// cabeça
+	STICKMAN aux;
+	glClear(GL_COLOR_BUFFER_BIT);
+	//angulos
+	
+	switch (passagem){
+		case ANIMACAO_FASE_CONTRACT:
+			// cabeça
+			aux.cabeca.x = 0.01;
+			aux.cabeca.y = 0.5f;
+			aux.ang.cabeca 			= 270;	//
+			aux.ang.cotovelo1		= 20;	//
+			aux.ang.cotovelo2		= 260;	//
+			aux.ang.joelho1			= 290;	//
+			aux.ang.joelho2			= 235;	//
+			aux.ang.ombro1			= 280;	//
+			aux.ang.ombro2			= 240;	//
+			aux.ang.ombroQ			= 267;	//
+			aux.ang.quadril1		= 290; 	//
+			aux.ang.quadril2		= 250;	//
+			aux.ang.tornozelo1		= 30;	//
+			aux.ang.tornozelo2		= 330;	//
+			break;
+		case ANIMACAO_FASE_DOWN:
+			// cabeça
+			aux.cabeca.x = 0.01;
+			aux.cabeca.y = 0.49f;
+			aux.ang.cabeca 			= 270;	//
+			aux.ang.cotovelo1		= 350;	//
+			aux.ang.cotovelo2		= 270;	//
+			aux.ang.joelho1			= 290;	//
+			aux.ang.joelho2			= 230;	//
+			aux.ang.ombro1			= 280;	//
+			aux.ang.ombro2			= 245;	//
+			aux.ang.ombroQ			= 267;	//
+			aux.ang.quadril1		= 305; 	//
+			aux.ang.quadril2		= 250;	//
+			aux.ang.tornozelo1		= 00;	//
+			aux.ang.tornozelo2		= 320;	//
+			
+			break;
+		case ANIMACAO_FASE_PASSO:
+			
+			aux.cabeca.x = 0.01;
+			aux.cabeca.y = 0.525f;
+			aux.ang.cabeca 			= 270;	
+			aux.ang.cotovelo1		= 280;	//
+			aux.ang.cotovelo2		= 280;	//
+			aux.ang.joelho1			= 270;	//
+			aux.ang.joelho2			= 225;	//
+			aux.ang.ombro1			= 270;	//
+			aux.ang.ombro2			= 260;	//
+			aux.ang.ombroQ			= 267;	//
+			aux.ang.quadril1		= 270; 	//
+			aux.ang.quadril2		= 280;	//
+			aux.ang.tornozelo1		= 00;	//
+			aux.ang.tornozelo2		= 280;	//
+			break;
+		case ANIMACAO_FASE_UP:
+			
+			aux.cabeca.x = 0.01;
+			aux.cabeca.y = 0.535f;
+			aux.ang.cabeca 			= 270;	//
+			aux.ang.cotovelo1		= 275;	//
+			aux.ang.cotovelo2		= 310;	//
+			aux.ang.joelho1			= 250;	//
+			aux.ang.joelho2			= 230;	//
+			aux.ang.ombro1			= 250;	//
+			aux.ang.ombro2			= 280;	//
+			aux.ang.ombroQ			= 267;	//
+			aux.ang.quadril1		= 260; 	//
+			aux.ang.quadril2		= 290;	//
+			aux.ang.tornozelo1		= 320;	//
+			aux.ang.tornozelo2		= 330;	//
+			break;
+	}
+	
+	settempo--;
+	if(settempo <= 0){
+		settempo = 90;
+		togglePassagem();
+	}
+	//setaProximaPosicao(aux, settempo);
+	//angulos
+	henry.ang = aux.ang;
+	henry.cabeca = aux.cabeca;
+	//ombro
+	henry.ombro.x = distanciax(H_PESCOCO, henry.ang.cabeca, henry.cabeca.x);
+	henry.ombro.y = distanciay(H_PESCOCO, henry.ang.cabeca, henry.cabeca.y);
+	
+	//cotovelos
+	henry.cotovelo1.x = distanciax(H_BRACOS, henry.ang.ombro1, henry.ombro.x);
+	henry.cotovelo1.y = distanciay(H_BRACOS, henry.ang.ombro1, henry.ombro.y);
+	
+	henry.cotovelo2.x = distanciax(H_BRACOS, henry.ang.ombro2, henry.ombro.x);
+	henry.cotovelo2.y = distanciay(H_BRACOS, henry.ang.ombro2, henry.ombro.y);
+	
+	//mãos
+	henry.mao1.x = distanciax(H_ANTEBRACO, henry.ang.cotovelo1, henry.cotovelo1.x);
+	henry.mao1.y = distanciay(H_ANTEBRACO, henry.ang.cotovelo1, henry.cotovelo1.y);
+	
+	henry.mao2.x = distanciax(H_ANTEBRACO, henry.ang.cotovelo2, henry.cotovelo2.x);
+	henry.mao2.y = distanciay(H_ANTEBRACO, henry.ang.cotovelo2, henry.cotovelo2.y);
+	
+	//quadril
+	henry.quadril.x = distanciax(H_TRONCO, henry.ang.ombroQ, henry.ombro.x);
+	henry.quadril.y = distanciay(H_TRONCO, henry.ang.ombroQ, henry.ombro.y);
+	
+	//joelho
+	henry.joelho1.x = distanciax(H_COXAS, henry.ang.quadril1, henry.quadril.x);
+	henry.joelho1.y = distanciay(H_COXAS, henry.ang.quadril1, henry.quadril.y);
+	
+	henry.joelho2.x = distanciax(H_COXAS, henry.ang.quadril2, henry.quadril.x);
+	henry.joelho2.y = distanciay(H_COXAS, henry.ang.quadril2, henry.quadril.y);
+	
+	//calcanhar
+	henry.calcanhar1.x = distanciax(H_PANTURRILHA, henry.ang.joelho1, henry.joelho1.x);
+	henry.calcanhar1.y = distanciay(H_PANTURRILHA, henry.ang.joelho1, henry.joelho1.y);
+	
+	henry.calcanhar2.x = distanciax(H_PANTURRILHA, henry.ang.joelho2, henry.joelho2.x);
+	henry.calcanhar2.y = distanciay(H_PANTURRILHA, henry.ang.joelho2, henry.joelho2.y);
+	
+	//pé
+	henry.pe1.x = distanciax(H_PES, henry.ang.tornozelo1, henry.calcanhar1.x);
+	henry.pe1.y = distanciay(H_PES, henry.ang.tornozelo1, henry.calcanhar1.y);
+	
+	henry.pe2.x = distanciax(H_PES, henry.ang.tornozelo2, henry.calcanhar2.x);
+	henry.pe2.y = distanciay(H_PES, henry.ang.tornozelo2, henry.calcanhar2.y);
+}
+
+void setaProximaPosicao(STICKMAN posDes, int tempo){
+	
+	henry.ang.cabeca 		+= (henry.ang.cabeca - posDes.ang.cabeca) / tempo;
+	henry.ang.cotovelo1 	+= (henry.ang.cabeca - posDes.ang.cotovelo1) / tempo;
+	henry.ang.cotovelo2 	+= (henry.ang.cabeca - posDes.ang.cotovelo2) / tempo;
+	henry.ang.joelho1 		+= (henry.ang.cabeca - posDes.ang.joelho1) / tempo;
+	henry.ang.joelho2 		+= (henry.ang.cabeca - posDes.ang.joelho2) / tempo;
+	henry.ang.ombro1 		+= (henry.ang.cabeca - posDes.ang.ombro1) / tempo;
+	henry.ang.ombro2 		+= (henry.ang.cabeca - posDes.ang.ombro2) / tempo;
+	henry.ang.ombroQ 		+= (henry.ang.cabeca - posDes.ang.ombroQ) / tempo;
+	henry.ang.quadril1 		+= (henry.ang.cabeca - posDes.ang.quadril1) / tempo;
+	henry.ang.quadril2 		+= (henry.ang.cabeca - posDes.ang.quadril2) / tempo;
+	henry.ang.tornozelo1 	+= (henry.ang.cabeca - posDes.ang.tornozelo1) / tempo;
+	henry.ang.tornozelo2 	+= (henry.ang.cabeca - posDes.ang.tornozelo2) / tempo;
+	//henry.cabeca.x			+= (henry.cabeca.x - posDes.cabeca.x) / (float)tempo;
+	//henry.cabeca.y			+= (henry.cabeca.y - posDes.cabeca.y) / (float)tempo;
+	
+}
 
 

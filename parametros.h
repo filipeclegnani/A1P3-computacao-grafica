@@ -21,6 +21,11 @@
 #define distanciax(r,a,p) ((cos(2*PI*a/360)*(r))+p)
 #define distanciay(r,a,p) ((sin(2*PI*a/360)*(r))+p)
 
+#define ANIMACAO_FASE_CONTRACT	0
+#define ANIMACAO_FASE_DOWN		1
+#define ANIMACAO_FASE_PASSO		2
+#define ANIMACAO_FASE_UP		3
+
 typedef struct {
 	float R;
 	float G;
@@ -31,6 +36,24 @@ typedef struct {
 	float x;
 	float y;
 }PONTO;
+
+typedef struct{
+	/*
+	 * o angulo baseado da cabeça aos outros membros
+	*/
+	float cabeca;
+	float ombro1;
+	float ombro2;
+	float ombroQ;
+	float cotovelo1;
+	float cotovelo2;
+	float quadril1;
+	float quadril2;
+	float joelho1;
+	float joelho2;
+	float tornozelo1;
+	float tornozelo2;
+}STICKMAN_ANGULOS;
 
 typedef struct{
 	PONTO cabeca;
@@ -46,6 +69,7 @@ typedef struct{
 	PONTO calcanhar2;
 	PONTO pe1;
 	PONTO pe2;
+	STICKMAN_ANGULOS ang;
 }STICKMAN;
 
 
