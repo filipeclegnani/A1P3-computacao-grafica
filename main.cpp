@@ -15,7 +15,7 @@ void desenhaLinha(PONTO a, PONTO b);
 void desenhaMundo();
 void startaStickman();
 void calculaMovimento();
-void setaProximaPosicao(STICKMAN posDes, int tempo);
+void setaProximaPosicao(STICKMAN posDes);
 void togglePassagem();
 
 STICKMAN henry = {0};
@@ -24,7 +24,8 @@ int passagem = ANIMACAO_FASE_CONTRACT;
 //int passagem = ANIMACAO_FASE_PASSO;
 //int passagem = ANIMACAO_FASE_UP;
 
-int settempo = 0;
+int settempo = 60;
+int vez = 0;
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR args, int ncmdshow) {
 
@@ -140,6 +141,12 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
 	return DefWindowProc(hwnd, msg, wp, lp);
 }
 
+void inverteFloat(float *a, float *b){
+	float aux = *a;
+	*a = *b;
+	*b = aux;
+}
+
 void togglePassagem(){
 	switch (passagem){
 		case ANIMACAO_FASE_CONTRACT:
@@ -153,6 +160,11 @@ void togglePassagem(){
 			break;
 		case ANIMACAO_FASE_UP:
 			passagem = ANIMACAO_FASE_CONTRACT;
+			if(vez == 1){
+				vez = 0;
+			}else{
+				vez = 1;
+			}
 			break;
 	}
 }
@@ -294,6 +306,8 @@ void calculaMovimento(){// cabeça
 	glClear(GL_COLOR_BUFFER_BIT);
 	//angulos
 	
+	
+	
 	switch (passagem){
 		case ANIMACAO_FASE_CONTRACT:
 			// cabeça
@@ -363,18 +377,25 @@ void calculaMovimento(){// cabeça
 			aux.ang.quadril2		= 290;	//
 			aux.ang.tornozelo1		= 320;	//
 			aux.ang.tornozelo2		= 330;	//
-			break;
 	}
 	
+	if(vez == 1){
+		inverteFloat(&aux.ang.cotovelo1, &aux.ang.cotovelo2);
+		inverteFloat(&aux.ang.joelho1, &aux.ang.joelho2);
+		inverteFloat(&aux.ang.ombro1, &aux.ang.ombro2);
+		inverteFloat(&aux.ang.quadril1, &aux.ang.quadril2);
+		inverteFloat(&aux.ang.tornozelo1, &aux.ang.tornozelo1);
+	}
+	
+	setaProximaPosicao(aux);
 	settempo--;
 	if(settempo <= 0){
-		settempo = 90;
+		settempo = 62;
 		togglePassagem();
 	}
-	//setaProximaPosicao(aux, settempo);
 	//angulos
-	henry.ang = aux.ang;
-	henry.cabeca = aux.cabeca;
+	//henry.ang = aux.ang;
+	//henry.cabeca = aux.cabeca;
 	//ombro
 	henry.ombro.x = distanciax(H_PESCOCO, henry.ang.cabeca, henry.cabeca.x);
 	henry.ombro.y = distanciay(H_PESCOCO, henry.ang.cabeca, henry.cabeca.y);
@@ -419,22 +440,22 @@ void calculaMovimento(){// cabeça
 	henry.pe2.y = distanciay(H_PES, henry.ang.tornozelo2, henry.calcanhar2.y);
 }
 
-void setaProximaPosicao(STICKMAN posDes, int tempo){
+void setaProximaPosicao(STICKMAN posDes){
 	
-	henry.ang.cabeca 		+= (henry.ang.cabeca - posDes.ang.cabeca) / tempo;
-	henry.ang.cotovelo1 	+= (henry.ang.cabeca - posDes.ang.cotovelo1) / tempo;
-	henry.ang.cotovelo2 	+= (henry.ang.cabeca - posDes.ang.cotovelo2) / tempo;
-	henry.ang.joelho1 		+= (henry.ang.cabeca - posDes.ang.joelho1) / tempo;
-	henry.ang.joelho2 		+= (henry.ang.cabeca - posDes.ang.joelho2) / tempo;
-	henry.ang.ombro1 		+= (henry.ang.cabeca - posDes.ang.ombro1) / tempo;
-	henry.ang.ombro2 		+= (henry.ang.cabeca - posDes.ang.ombro2) / tempo;
-	henry.ang.ombroQ 		+= (henry.ang.cabeca - posDes.ang.ombroQ) / tempo;
-	henry.ang.quadril1 		+= (henry.ang.cabeca - posDes.ang.quadril1) / tempo;
-	henry.ang.quadril2 		+= (henry.ang.cabeca - posDes.ang.quadril2) / tempo;
-	henry.ang.tornozelo1 	+= (henry.ang.cabeca - posDes.ang.tornozelo1) / tempo;
-	henry.ang.tornozelo2 	+= (henry.ang.cabeca - posDes.ang.tornozelo2) / tempo;
-	//henry.cabeca.x			+= (henry.cabeca.x - posDes.cabeca.x) / (float)tempo;
-	//henry.cabeca.y			+= (henry.cabeca.y - posDes.cabeca.y) / (float)tempo;
+	henry.ang.cabeca 		+= (float)(posDes.ang.cabeca - henry.ang.cabeca) / (float)settempo;
+	henry.ang.cotovelo1 	+= (float)(posDes.ang.cotovelo1 - henry.ang.cotovelo1) / (float)settempo;
+	henry.ang.cotovelo2 	+= (float)(posDes.ang.cotovelo2 - henry.ang.cotovelo2) / (float)settempo;
+	henry.ang.joelho1 		+= (float)(posDes.ang.joelho1 - henry.ang.joelho1) / (float)settempo;
+	henry.ang.joelho2 		+= (float)(posDes.ang.joelho2 - henry.ang.joelho2) / (float)settempo;
+	henry.ang.ombro1 		+= (float)(posDes.ang.ombro1 - henry.ang.ombro1) / (float)settempo;
+	henry.ang.ombro2 		+= (float)(posDes.ang.ombro2 - henry.ang.ombro2) / (float)settempo;
+	henry.ang.ombroQ 		+= (float)(posDes.ang.ombroQ - henry.ang.ombroQ) / (float)settempo;
+	henry.ang.quadril1 		+= (float)(posDes.ang.quadril1 - henry.ang.quadril1) / (float)settempo;
+	henry.ang.quadril2 		+= (float)(posDes.ang.quadril2 - henry.ang.quadril2) / (float)settempo;
+	henry.ang.tornozelo1 	+= (float)(posDes.ang.tornozelo1 - henry.ang.tornozelo1) / (float)settempo;
+	henry.ang.tornozelo2 	+= (float)(posDes.ang.tornozelo2 - henry.ang.tornozelo2) / (float)settempo;
+	henry.cabeca.x			+= (posDes.cabeca.x - henry.cabeca.x) / (float)settempo;
+	henry.cabeca.y			+= (posDes.cabeca.y - henry.cabeca.y) / (float)settempo;
 	
 }
 
