@@ -26,6 +26,11 @@
 #define ANIMACAO_FASE_PASSO		2
 #define ANIMACAO_FASE_UP		3
 
+#define ANIMACAO_MODO_PARADO 0
+#define ANIMACAO_MODO_CAORRENDO 1
+#define ANIMACAO_MODO_ANDANDO 2
+
+
 typedef struct {
 	float R;
 	float G;
