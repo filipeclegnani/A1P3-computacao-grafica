@@ -12,6 +12,7 @@ LRESULT CALLBACK WindowProcedure(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 
 void desenhaCirculo(PONTO centro, float raio, COR c);
 void desenhaLinha(PONTO a, PONTO b);
+void desenhaTriangulo(PONTO a, PONTO b, PONTO c);
 void desenhaMundo();
 void startaStickman();
 void calculaMovimento();
@@ -255,43 +256,53 @@ void desenhaLinha(PONTO a, PONTO b){
 	glFlush();
 }
 
+void desenhaTriangulo(PONTO a, PONTO b, PONTO c){
+	glBegin(GL_TRIANGLES);
+	glColor3f (1, 1, 1);
+	glVertex2f(a.x, a.y);
+	glVertex2f(b.x, b.y);
+	glVertex2f(c.x, c.y);
+	glEnd();
+	glFlush();
+}
+
 
 void desenhaMundo(){
 	// cabeça
 	desenhaCirculo(henry.cabeca, RAIO_CABECA, T_COLOR_WHITE);
 	
+	// linhas
+	//cabaça
 	desenhaLinha(henry.cabeca, henry.ombro);
 	//ombro
-	desenhaCirculo(henry.ombro, RAIO_JUNTA, T_COLOR_RED);
-	
 	desenhaLinha(henry.ombro, henry.cotovelo1);
 	desenhaLinha(henry.ombro, henry.cotovelo2);
-	//cotovelos
-	desenhaCirculo(henry.cotovelo1, RAIO_JUNTA, T_COLOR_RED);
-	desenhaCirculo(henry.cotovelo2, RAIO_JUNTA, T_COLOR_RED);
-	
+	//cotovelo
 	desenhaLinha(henry.cotovelo1, henry.mao1);
 	desenhaLinha(henry.cotovelo2, henry.mao2);
-	//mãos
-	
 	//quadril
 	desenhaLinha(henry.ombro, henry.quadril);
-	
-	desenhaCirculo(henry.quadril, RAIO_JUNTA, T_COLOR_RED);
-	
 	desenhaLinha(henry.quadril, henry.joelho1);
 	desenhaLinha(henry.quadril, henry.joelho2);
 	//joelho
-	desenhaCirculo(henry.joelho1, RAIO_JUNTA, T_COLOR_RED);
-	desenhaCirculo(henry.joelho2, RAIO_JUNTA, T_COLOR_RED);
-	
-	//calcanhar
 	desenhaLinha(henry.joelho1, henry.calcanhar1);
 	desenhaLinha(henry.joelho2, henry.calcanhar2);
-	
-	//pé
+	//calcanhar
 	desenhaLinha(henry.calcanhar1, henry.pe1);
 	desenhaLinha(henry.calcanhar2, henry.pe2);
+	//pé
+	
+	// circulos
+	//ombro
+	desenhaCirculo(henry.ombro, RAIO_JUNTA, T_COLOR_RED);
+	//cotovelos
+	desenhaCirculo(henry.cotovelo1, RAIO_JUNTA, T_COLOR_RED);
+	desenhaCirculo(henry.cotovelo2, RAIO_JUNTA, T_COLOR_RED);
+	//quadril
+	desenhaCirculo(henry.quadril, RAIO_JUNTA, T_COLOR_RED);
+	//joelho
+	desenhaCirculo(henry.joelho1, RAIO_JUNTA, T_COLOR_RED);
+	desenhaCirculo(henry.joelho2, RAIO_JUNTA, T_COLOR_RED);
 	
 }
 
