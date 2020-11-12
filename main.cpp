@@ -268,8 +268,19 @@ void desenhaTriangulo(PONTO a, PONTO b, PONTO c){
 
 
 void desenhaMundo(){
+	PONTO n1, n2, n3;
+	n1.x = distanciax(RAIO_CABECA, 6, henry.cabeca.x);
+	n1.y = distanciay(RAIO_CABECA, 6, henry.cabeca.y);
+	
+	n2.x = distanciax(RAIO_CABECA, 350, henry.cabeca.x);
+	n2.y = distanciay(RAIO_CABECA, 350, henry.cabeca.y);
+	
+	n3.x = distanciax(RAIO_CABECA+0.01f, 350, henry.cabeca.x);
+	n3.y = distanciay(RAIO_CABECA+0.01f, 350, henry.cabeca.y);
+	
 	// cabeça
 	desenhaCirculo(henry.cabeca, RAIO_CABECA, T_COLOR_WHITE);
+	desenhaTriangulo(n1, n2, n3);
 	
 	// linhas
 	//cabaça
